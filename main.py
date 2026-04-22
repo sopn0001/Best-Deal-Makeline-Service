@@ -73,7 +73,8 @@ def process_order(ch, method, _props, body):
 
 
 def consume():
-    for attempt in range(15):
+    attempt = 0
+    while True:
         try:
             conn    = pika.BlockingConnection(pika.URLParameters(RABBITMQ_URL))
             channel = conn.channel()
@@ -84,7 +85,8 @@ def consume():
             channel.start_consuming()
             return
         except Exception as exc:
-            print(f"[Makeline] RabbitMQ attempt {attempt + 1}/15 failed: {exc}. Retry in 5s…", flush=True)
+            attempt += 1
+            print(f"[Makeline] RabbitMQ attempt {attempt} failed: {exc}. Retry in 5s…", flush=True)
             time.sleep(5)
 
 
